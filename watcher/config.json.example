@@ -1,0 +1,17 @@
+{
+  "heartBeatServer": {
+    "ipAddress": "127.0.0.1",
+    "port": 10000,
+    "interval": 40
+  },
+  "watchPath": "./",
+  "email": {
+    "name": "abc@def.com",
+    "password": "def"
+  },
+  "jpush": {
+    "appKey": "abc",
+    "masterSecret": "def"
+  },
+  "enableLog": "true"
+}

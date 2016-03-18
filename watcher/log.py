@@ -2,8 +2,8 @@
 # -*- coding:utf-8 -*-
 # File          : log.py
 # Author        : bssthu
-# Project       : rtk_trans
-# Description   : socket 转发数据
+# Project       : cyl-eye-770
+# Description   :
 # 
 
 import logging
@@ -30,7 +30,7 @@ def initialize_logging(to_file=True):
 
     # to file
     if to_file:
-        fh = logging.handlers.RotatingFileHandler('logs/rtk.log', maxBytes=524288000, backupCount=10)
+        fh = logging.handlers.RotatingFileHandler('logs/rtk.log', maxBytes=52428800, backupCount=10)
         fh.setLevel(logging.DEBUG)
         fh.doRollover()
         fh.setFormatter(formatter)
