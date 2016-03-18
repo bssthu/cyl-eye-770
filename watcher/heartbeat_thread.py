@@ -19,8 +19,7 @@ class HeartbeatThread(threading.Thread):
         """构造函数
 
         Args:
-            server_ip: 服务器IP地址
-            server_port: 服务器端口
+            server_config: 服务器配置信息
         """
         super().__init__()
         self.server_ip = server_config['ipAddress']
@@ -33,14 +32,14 @@ class HeartbeatThread(threading.Thread):
 
         循环运行，建立连接、发送心跳包，并在连接出错时重连。
         """
-        log.info('client thread: start')
+        log.info('heartbeat: start')
         while self.running:
             try:
                 self.send_data()
             except Exception as e:      # 发生异常时重连
-                log.error('client thread error: %s' % e)
+                log.error('heartbeat error: %s' % e)
                 time.sleep(3)
-        log.info('client thread: bye')
+        log.info('heartbeat: bye')
 
     def send_data(self):
         """建立连接并循环发送心跳包
@@ -48,7 +47,7 @@ class HeartbeatThread(threading.Thread):
         在超时时重连，在出错时返回。
         """
         client = self.connect()
-        log.info('client thread: connected')
+        log.info('heartbeat: connected')
         timeout_count = 0
         while self.running:
             try:
@@ -67,13 +66,13 @@ class HeartbeatThread(threading.Thread):
                 if timeout_count >= 5:
                     timeout_count = 0
                     client = self.reconnect(client)
-                    log.debug('client timeout, reconnect')
+                    log.debug('heartbeat timeout, reconnect')
         try:
             client.close()
         except socket.error:
             pass
         except Exception as e:
-            log.error('client exception when close: %s' % e)
+            log.error('heartbeat exception when close: %s' % e)
 
     def connect(self):
         """尝试建立连接并设置超时参数"""
@@ -95,5 +94,5 @@ class HeartbeatThread(threading.Thread):
         try:
             client.close()
         except:
-            log.error('client exception when close.')
+            log.error('heartbeat exception when close.')
         return self.connect()

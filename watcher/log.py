@@ -23,14 +23,14 @@ def initialize_logging(to_file=True):
     """
 
     global logger
-    logger = logging.getLogger('rtk')
+    logger = logging.getLogger('eye')
     logger.setLevel(logging.DEBUG)
 
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     # to file
     if to_file:
-        fh = logging.handlers.RotatingFileHandler('logs/rtk.log', maxBytes=52428800, backupCount=10)
+        fh = logging.handlers.RotatingFileHandler('logs/eye.log', maxBytes=52428800, backupCount=10)
         fh.setLevel(logging.DEBUG)
         fh.doRollover()
         fh.setFormatter(formatter)

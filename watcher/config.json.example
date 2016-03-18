@@ -4,10 +4,13 @@
     "port": 10000,
     "interval": 40
   },
-  "watchPath": "./",
   "email": {
     "name": "abc@def.com",
-    "password": "def"
+    "password": "def",
+    "interval": 1800,
+    "watchPath": "./",
+    "fileExt": "log",
+    "fileNum": 2
   },
   "jpush": {
     "appKey": "abc",
