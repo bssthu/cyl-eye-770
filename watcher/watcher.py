@@ -35,6 +35,7 @@ def load_config(config_file_name):
             and 'email' in configs \
             and 'name' in configs['email'] \
             and 'password' in configs['email'] \
+            and 'smtpServer' in configs['email'] \
             and 'interval' in configs['email'] \
             and 'watchPath' in configs['email'] \
             and 'fileExt' in configs['email'] \
