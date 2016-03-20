@@ -3,7 +3,7 @@
 # File          : server.py
 # Author        : bssthu
 # Project       : cyl-eye-770
-# Description   : main
+# Description   : server main
 # 
 
 import json
@@ -27,7 +27,7 @@ def load_config(config_file_name):
         print('failed to load config from %s.' % config_file_name)
         return None
 
-    # TODO: check
+    # check
     if 'port' in configs \
             and 'jpush' in configs \
             and 'appKey' in configs['jpush'] \
