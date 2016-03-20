@@ -38,7 +38,7 @@ class HeartbeatThread(threading.Thread):
                 self.send_data()
             except Exception as e:      # 发生异常时重连
                 log.error('heartbeat error: %s' % e)
-                time.sleep(3)
+                time.sleep(5)
         log.info('heartbeat: bye')
 
     def send_data(self):
@@ -82,7 +82,7 @@ class HeartbeatThread(threading.Thread):
             client.connect((self.server_ip, self.server_port))
         except socket.timeout as e:
             raise socket.timeout('%s when connect' % e)
-        client.settimeout(3)
+        client.settimeout(5)
         return client
 
     def reconnect(self, client):

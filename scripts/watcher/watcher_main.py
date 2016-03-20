@@ -3,13 +3,15 @@
 # File          : watcher.py
 # Author        : bssthu
 # Project       : cyl-eye-770
-# Description   : main
+# Description   : watcher main
 # 
 
 import json
+import os.path
 import log
-from heartbeat_thread import HeartbeatThread
-from mail_sender_thread import MailSenderThread
+import watcher
+from watcher.heartbeat_thread import HeartbeatThread
+from watcher.mail_sender_thread import MailSenderThread
 
 
 def load_config(config_file_name):
@@ -54,12 +56,17 @@ def main():
     """主函数"""
 
     # config
-    configs = load_config('config.json')
+    script_dir = os.path.join(os.path.dirname(watcher.__file__), os.path.pardir)
+    root_dir = os.path.abspath(os.path.join(script_dir, os.path.pardir))
+    config_file_name = os.path.abspath(os.path.join(os.path.join(root_dir, 'conf'), 'watcher_config.json'))
+    configs = load_config(config_file_name)
     if configs is None:
         return
 
     # log init
-    log.initialize_logging(configs['enableLog'].lower() == 'true')
+    log_path = os.path.abspath(os.path.join(root_dir, 'logs'))
+    print(log_path)
+    log.initialize_logging('watcher', log_path, configs['enableLog'].lower() == 'true')
     log.info('main: start')
 
     # threads
@@ -83,6 +90,3 @@ def main():
     mail_sender.running = False
     mail_sender.join()
 
-
-if __name__ == '__main__':
-    main()

@@ -61,6 +61,9 @@ target/
 #Ipython Notebook
 .ipynb_checkpoints
 
+*~
+.*.swp
+
 .idea/
 
 *.json
