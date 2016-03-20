@@ -64,4 +64,3 @@ class MailSenderThread(threading.Thread):
         # 发送邮件
         mail_util.send_mail(zip_file, self.email_name, self.email_password, self.smtp_server)
         log.info('email sent.')
-

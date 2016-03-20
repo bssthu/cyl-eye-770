@@ -65,9 +65,8 @@ def main():
 
     # log init
     log_path = os.path.abspath(os.path.join(root_dir, 'logs'))
-    print(log_path)
     log.initialize_logging('watcher', log_path, configs['enableLog'].lower() == 'true')
-    log.info('main: start')
+    log.info('watcher main: start')
 
     # threads
     heartbeat = HeartbeatThread(configs['heartBeatServer'])
@@ -90,3 +89,4 @@ def main():
     mail_sender.running = False
     mail_sender.join()
 
+    log.info('watcher main: bye')

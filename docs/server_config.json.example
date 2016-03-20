@@ -1,0 +1,8 @@
+{
+  "port": 10000,
+  "jpush": {
+    "appKey": "abc",
+    "masterSecret": "def"
+  },
+  "enableLog": "true"
+}
