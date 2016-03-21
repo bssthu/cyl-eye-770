@@ -6,6 +6,7 @@
 # Description   : 报警推送模块
 #
 
+import threading
 # try to support python2
 try:
     import urllib.request as rq
@@ -38,24 +39,46 @@ def initialize_warn(jpush_config):
 
 
 def push(msg):
-    try:
-        url = 'https://api.jpush.cn/v3/push'
-        headers = {
-            'content-type': 'application/json',
-            'Authorization': 'Basic %s' % base64_auth_string
-        }
-        values = {
-            "platform": "all",
-            "audience": "all",
-            "notification": {
-                "alert": msg
+    WarnPushThread(base64_auth_string, msg).start()
+
+
+class WarnPushThread(threading.Thread):
+    """发送 jpush 的线程"""
+
+    def __init__(self, auth_string, msg):
+        """构造函数
+
+        Args:
+            auth_string: 身份验证字符串
+            msg: 要推送的消息
+        """
+        super().__init__()
+        self.auth_string = auth_string
+        self.msg = msg
+
+    def run(self):
+        """线程主函数
+
+        用 https 方式发送推送
+        """
+        try:
+            url = 'https://api.jpush.cn/v3/push'
+            headers = {
+                'content-type': 'application/json',
+                'Authorization': 'Basic %s' % self.auth_string
             }
-        }
-        data = urlencode(values).encode()
-        req = rq.Request(url, data=data, headers=headers)
-        response = rq.urlopen(req)
-        log.debug('push: %s %s' % (response.status, response.reason))
-    except Exception as e:
-        log.error('push error: %s' % e)
-    else:
-        log.debug('push warn msg: %s' % msg)
+            values = {
+                "platform": "all",
+                "audience": "all",
+                "notification": {
+                    "alert": self.msg
+                }
+            }
+            data = urlencode(values).encode()
+            req = rq.Request(url, data=data, headers=headers)
+            response = rq.urlopen(req)
+            log.debug('push: %s %s' % (response.status, response.reason))
+        except Exception as e:
+            log.error('push error: %s' % e)
+        else:
+            log.debug('push warn msg: %s' % self.msg)

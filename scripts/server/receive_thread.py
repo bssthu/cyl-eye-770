@@ -9,6 +9,7 @@
 import socket
 import threading
 import log
+import warn
 
 
 class ReceiveThread(threading.Thread):
@@ -43,6 +44,7 @@ class ReceiveThread(threading.Thread):
                 if data is None or len(data) == 0:
                     # 连接被关闭，报警
                     log.warning('receive thread %d: socket closed' % self.client_id)
+                    warn.push('server: 与客户端的连接被关闭')
                     self.running = False
                 self.timeout_count = 0
             except socket.timeout:
@@ -50,10 +52,12 @@ class ReceiveThread(threading.Thread):
                 if self.timeout_count >= self.timeout_limit:
                     # 超时报警，只报一次
                     log.warning('receive thread %d: timeout' % self.client_id)
+                    warn.push('server: 与客户端通信超时')
                     self.running = False
             except Exception as e:
                 # 发生异常，报警
                 log.error('receive thread %d error: %s' % (self.client_id, e))
+                warn.push('server: 服务器异常')
                 self.running = False
         self.disconnect()
         log.info('receive thread %d: bye' % self.client_id)

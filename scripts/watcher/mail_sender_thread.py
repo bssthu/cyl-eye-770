@@ -9,6 +9,7 @@
 import threading
 import time
 import log
+import warn
 import watcher.mail_util as mail_util
 
 
@@ -40,13 +41,20 @@ class MailSenderThread(threading.Thread):
         # check
         log.info('mail sender: start')
 
+        last_send_ok = True
+
         # send & wait
         while self.running:
             # 发送
             try:
                 self.send_data()
-            except Exception as e:      # TODO: 发生异常时报警
+            except Exception as e:
                 log.error('mail sender error: %s' % e)
+                if last_send_ok:
+                    warn.push('watcher: 邮件发送失败')
+                    last_send_ok = False
+            else:
+                last_send_ok = True
             # 延时
             for i in range(0, self.interval):
                 time.sleep(1)
