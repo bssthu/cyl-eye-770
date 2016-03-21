@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding:utf-8 -*-
-# File          : server_thread.py
+# File          : listen_thread.py
 # Author        : bssthu
 # Project       : cyl-eye-770
 # Description   : 
@@ -11,19 +11,21 @@ import threading
 import log
 
 
-class ServerThread(threading.Thread):
+class ListenThread(threading.Thread):
     """监听来自客户端的连接的线程"""
 
-    def __init__(self, port, got_client_cb):
+    def __init__(self, server_config, timeout_cb):
         """构造函数
 
         Args:
-            port: 监听的端口
-            got_client_cb: 接受到客户端连接后的回调函数
+            server_config: 服务器配置信息
+            timeout_cb: 超时时的回调函数
         """
         super().__init__()
-        self.port = port
-        self.got_client_cb = got_client_cb
+        self.port = server_config['port']
+        self.timeout = server_config['timeout']
+        self.timeout_cb = timeout_cb
+        self.client = None
         self.running = True
 
     def run(self):
@@ -31,7 +33,7 @@ class ServerThread(threading.Thread):
 
         循环运行，接受新的客户端的连接。
         """
-        log.info('server thread: start, port: %d' % self.port)
+        log.info('listen thread: start, port: %d' % self.port)
         try:
             server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -42,12 +44,12 @@ class ServerThread(threading.Thread):
                 try:
                     conn, address = server.accept()
                     conn.settimeout(3)
-                    self.got_client_cb(conn, address)
+                    self.client = conn
                     log.debug('new client from: %s' % str(address))
                 except socket.timeout:
                     pass
             server.close()
-            log.info('server thread: bye')
+            log.info('listen thread: bye')
         except Exception as e:
-            log.error('server thread error: %s' % e)
+            log.error('listen thread error: %s' % e)
             self.running = False

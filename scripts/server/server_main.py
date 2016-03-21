@@ -10,6 +10,7 @@ import json
 import os.path
 import log
 import server
+from server.listen_thread import ListenThread
 
 
 def load_config(config_file_name):
@@ -28,7 +29,9 @@ def load_config(config_file_name):
         return None
 
     # check
-    if 'port' in configs \
+    if 'heartBeatServer' in configs \
+            and 'port' in configs['heartBeatServer'] \
+            and 'timeout' in configs['heartBeatServer'] \
             and 'jpush' in configs \
             and 'appKey' in configs['jpush'] \
             and 'masterSecret' in configs['jpush'] \
@@ -55,5 +58,21 @@ def main():
     log.initialize_logging('server', log_path, configs['enableLog'].lower() == 'true')
     log.info('server main: start')
 
+    # threads
+    heartbeat_listener = ListenThread(configs['heartBeatServer'], None)
+
+    heartbeat_listener.start()
+
+    # keyboard
+    try:
+        print("enter 'q' to quit")
+        while input() != 'q':
+            print("enter 'q' to quit.")
+    except KeyboardInterrupt:
+        pass
+
     # quit & clean up
+    heartbeat_listener.running = False
+    heartbeat_listener.join()
+
     log.info('server main: bye')
