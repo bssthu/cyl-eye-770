@@ -3,6 +3,9 @@
     "port": 10000,
     "timeout": 300
   },
+  "httpServer": {
+    "port": 10001,
+  },
   "jpush": {
     "appKey": "abc",
     "masterSecret": "def"
