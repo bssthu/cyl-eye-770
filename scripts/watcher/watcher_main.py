@@ -9,6 +9,7 @@
 import json
 import os.path
 import log
+import warn
 import watcher
 from watcher.heartbeat_thread import HeartbeatThread
 from watcher.mail_sender_thread import MailSenderThread
@@ -67,6 +68,7 @@ def main():
     log_path = os.path.abspath(os.path.join(root_dir, 'logs'))
     log.initialize_logging('watcher', log_path, configs['enableLog'].lower() == 'true')
     log.info('watcher main: start')
+    warn.initialize_warn(configs['jpush'])
 
     # threads
     heartbeat = HeartbeatThread(configs['heartBeatServer'])

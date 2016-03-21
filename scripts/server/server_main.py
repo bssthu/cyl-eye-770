@@ -9,6 +9,7 @@
 import json
 import os.path
 import log
+import warn
 import server
 from server.listen_thread import ListenThread
 
@@ -57,6 +58,7 @@ def main():
     log_path = os.path.abspath(os.path.join(root_dir, 'logs'))
     log.initialize_logging('server', log_path, configs['enableLog'].lower() == 'true')
     log.info('server main: start')
+    warn.initialize_warn(configs['jpush'])
 
     # threads
     heartbeat_listener = ListenThread(configs['heartBeatServer'])
