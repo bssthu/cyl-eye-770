@@ -1,5 +1,8 @@
 {
-  "port": 10000,
+  "heartBeatServer": {
+    "port": 10000,
+    "timeout": 300
+  },
   "jpush": {
     "appKey": "abc",
     "masterSecret": "def"

@@ -59,7 +59,7 @@ def main():
     log.info('server main: start')
 
     # threads
-    heartbeat_listener = ListenThread(configs['heartBeatServer'], None)
+    heartbeat_listener = ListenThread(configs['heartBeatServer'])
 
     heartbeat_listener.start()
 
