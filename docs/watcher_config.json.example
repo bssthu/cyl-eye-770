@@ -4,6 +4,9 @@
     "port": 10000,
     "interval": 40
   },
+  "httpServer": {
+    "port": 10001
+  },
   "email": {
     "name": "abc@def.com",
     "password": "def",

@@ -4,7 +4,7 @@
     "timeout": 300
   },
   "httpServer": {
-    "port": 10001,
+    "port": 10001
   },
   "jpush": {
     "appKey": "abc",
