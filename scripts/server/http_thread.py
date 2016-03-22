@@ -7,7 +7,6 @@
 # 
 
 import datetime
-import cgi
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import threading
 import urllib.parse
@@ -56,7 +55,9 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_response(200, message=None)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            self.wfile.write(b'<html><head></head><body>')
+            self.wfile.write(b'<html><head>')
+            self.wfile.write(b'<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />')
+            self.wfile.write(b'</head><body>')
             self.wfile.write(datetime.datetime.now().strftime('<div>current time: %Y-%m-%d, %H:%M:%S</div>').encode())
             self.wfile.write(b'<div>server running...</div>')
             self.wfile.write(b'<div>...</div>')
@@ -78,10 +79,33 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_error(404, message=None)
 
         length = int(self.headers['Content-Length'])
-        post_data = urllib.parse.parse_qs(self.rfile.read(length).decode('utf-8'))
-        if 'push_msg' in post_data:
-            push_msg = post_data['push_msg'][0]
+        push_msg = decode_post_data(self.rfile.read(length))
+        if push_msg is not None:
             self.alarm_history.append((datetime.datetime.now(), push_msg))
             warn.push_jpush(push_msg)
 
 
+def decode_post_data(raw_data):
+    """HTTP POST 内容解析
+
+        Args:
+            raw_data: 要解析的内容
+    """
+
+    post_data = None
+    try:
+        # 先尝试解码
+        post_data = urllib.parse.parse_qs(raw_data.decode(encoding='utf-8'))
+    except UnicodeDecodeError:
+        # 解码失败时，忽略错误再次解码，查找 encoding 字段
+        post_data_force_decode = urllib.parse.parse_qs(raw_data.decode(encoding='utf-8', errors='ignore'))
+        if 'encoding' in post_data_force_decode:
+            # 尝试用指定的字符编码解码
+            encoding = post_data_force_decode['encoding'][0]
+            post_data = urllib.parse.parse_qs(raw_data.decode(encoding=encoding))
+
+    # 判断解码是否成功、内容是否合理
+    if post_data is not None and 'push_msg' in post_data:
+        return post_data['push_msg'][0]
+    else:
+        return None
