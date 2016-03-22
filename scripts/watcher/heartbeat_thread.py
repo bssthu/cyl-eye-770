@@ -52,7 +52,7 @@ class HeartbeatThread(threading.Thread):
         while self.running:
             try:
                 # 发送数据
-                client.sendall(b'@')
+                client.sendall(b'@'*10)
                 timeout_count = 0
                 # 延时
                 for i in range(0, self.interval):

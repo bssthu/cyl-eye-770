@@ -9,11 +9,12 @@
 import socket
 import threading
 import log
+import warn
 from server.receive_thread import ReceiveThread
 
 
 class ListenThread(threading.Thread):
-    """监听来自客户端的连接的线程"""
+    """监听来自客户端的连接的线程，并计时，当心跳超时时报告。"""
 
     def __init__(self, server_config):
         """构造函数
@@ -23,10 +24,14 @@ class ListenThread(threading.Thread):
         """
         super().__init__()
         self.port = server_config['port']
-        self.timeout = server_config['timeout']
-        self.client_thread = None
+        self.timeout_limit = server_config['timeout']
+        self.client_thread = None   # 接收心跳包的线程，单例
         self.client_id = 0
+        self.timeout_count = 0
         self.running = True
+
+    def get_heartbeat_cb(self):
+        self.timeout_count = 0
 
     def run(self):
         """线程主函数
@@ -42,17 +47,22 @@ class ListenThread(threading.Thread):
             server.settimeout(3)    # timeout: 3s
             while self.running:
                 try:
+                    # 等待新的连接接入
                     conn, address = server.accept()
                     conn.settimeout(3)
                     log.debug('new client %d from: %s' % (self.client_id, str(address)))
                     # stop old receive thread
                     self.stop_client_thread()
                     # start receive thread
-                    self.client_thread = ReceiveThread(conn, self.client_id, self.timeout)
+                    self.client_thread = ReceiveThread(conn, self.client_id, self.timeout_limit, self.get_heartbeat_cb)
                     self.client_thread.start()
                     self.client_id += 1
                 except socket.timeout:
-                    pass
+                    # 计数，判断心跳包超时
+                    self.timeout_count += 1
+                    if self.timeout_count == int(self.timeout_limit / 3):
+                        log.warning('listen thread: heartbeat timeout')
+                        warn.push('与客户端的连接超时')
             server.close()
             self.stop_client_thread()
             log.info('listen thread: bye')
