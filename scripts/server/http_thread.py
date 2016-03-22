@@ -63,6 +63,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             for timestamp, alarm_msg in self.alarm_history:
                 time_string = timestamp.strftime('%Y-%m-%d, %H:%M:%S')
                 self.wfile.write(('<div>%s, %s</div>' % (time_string, alarm_msg)).encode())
+            self.wfile.write(b'<div>...</div>')
         except IOError:
             self.send_error(404, message=None)
 

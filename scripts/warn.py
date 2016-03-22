@@ -6,6 +6,7 @@
 # Description   : 报警推送模块
 #
 
+import datetime
 import threading
 # try to support python2
 try:
@@ -54,7 +55,8 @@ class WarnPushThread(threading.Thread):
         """
         super().__init__()
         self.auth_string = auth_string
-        self.msg = msg
+        time_string = datetime.datetime.now().strftime('%Y-%m-%d, %H:%M:%S')
+        self.msg = '%s, %s' % (time_string, msg)
 
     def run(self):
         """线程主函数
