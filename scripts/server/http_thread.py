@@ -56,6 +56,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_response(200, message=None)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
+            self.wfile.write(b'<html><head></head><body>')
             self.wfile.write(datetime.datetime.now().strftime('<div>current time: %Y-%m-%d, %H:%M:%S</div>').encode())
             self.wfile.write(b'<div>server running...</div>')
             self.wfile.write(b'<div>...</div>')
@@ -64,6 +65,7 @@ class RequestHandler(BaseHTTPRequestHandler):
                 time_string = timestamp.strftime('%Y-%m-%d, %H:%M:%S')
                 self.wfile.write(('<div>%s, %s</div>' % (time_string, alarm_msg)).encode())
             self.wfile.write(b'<div>...</div>')
+            self.wfile.write(b'</body></html>')
         except IOError:
             self.send_error(404, message=None)
 
