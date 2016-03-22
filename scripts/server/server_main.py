@@ -62,7 +62,8 @@ def main():
     log_path = os.path.abspath(os.path.join(root_dir, 'logs'))
     log.initialize_logging('server', log_path, configs['enableLog'].lower() == 'true')
     log.info('server main: start')
-    warn.initialize_warn(configs['jpush'])
+    warn_server_config = {'ipAddress': '127.0.0.1', 'port': configs['httpServer']['port']}
+    warn.initialize_warn(configs['jpush'], warn_server_config)
 
     # threads
     heartbeat_listener = ListenThread(configs['heartBeatServer'])

@@ -82,6 +82,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         if 'push_msg' in post_data:
             push_msg = post_data['push_msg'][0]
             self.alarm_history.append((datetime.datetime.now(), push_msg))
-            warn.push(push_msg)
+            warn.push_jpush(push_msg)
 
 

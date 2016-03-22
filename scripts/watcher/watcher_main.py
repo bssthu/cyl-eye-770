@@ -35,6 +35,9 @@ def load_config(config_file_name):
             and 'ipAddress' in configs['heartBeatServer'] \
             and 'port' in configs['heartBeatServer'] \
             and 'interval' in configs['heartBeatServer'] \
+            and 'httpServer' in configs \
+            and 'ipAddress' in configs['httpServer'] \
+            and 'port' in configs['httpServer'] \
             and 'email' in configs \
             and 'name' in configs['email'] \
             and 'password' in configs['email'] \
@@ -68,7 +71,7 @@ def main():
     log_path = os.path.abspath(os.path.join(root_dir, 'logs'))
     log.initialize_logging('watcher', log_path, configs['enableLog'].lower() == 'true')
     log.info('watcher main: start')
-    warn.initialize_warn(configs['jpush'])
+    warn.initialize_warn(configs['jpush'], configs['httpServer'])
 
     # threads
     heartbeat = HeartbeatThread(configs['heartBeatServer'])
