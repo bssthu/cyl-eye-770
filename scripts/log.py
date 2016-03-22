@@ -34,7 +34,7 @@ def initialize_logging(name, path, to_file=True):
     # to file
     if to_file:
         log_file_name = os.path.abspath(os.path.join(path, name + '.log'))
-        fh = logging.handlers.RotatingFileHandler(log_file_name, maxBytes=52428800, backupCount=10)
+        fh = logging.handlers.RotatingFileHandler(log_file_name, maxBytes=100*1024*1024, backupCount=50)
         fh.setLevel(logging.DEBUG)
         fh.doRollover()
         fh.setFormatter(formatter)

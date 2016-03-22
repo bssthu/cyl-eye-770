@@ -60,10 +60,10 @@ class HeartbeatThread(threading.Thread):
                     if not self.running:
                         break
             except socket.timeout:
-                # 超时处理，超时5次时主动重连
+                # 超时处理，超时 interval/3 次，即 interval 秒时主动重连
                 # 超时时间短是为了在需要时能快速退出
                 timeout_count += 1
-                if timeout_count >= 5:
+                if timeout_count >= self.interval / 3:
                     timeout_count = 0
                     client = self.reconnect(client)
                     log.debug('heartbeat timeout, reconnect')
@@ -82,7 +82,7 @@ class HeartbeatThread(threading.Thread):
             client.connect((self.server_ip, self.server_port))
         except socket.timeout as e:
             raise socket.timeout('%s when connect' % e)
-        client.settimeout(5)
+        client.settimeout(3)
         return client
 
     def reconnect(self, client):

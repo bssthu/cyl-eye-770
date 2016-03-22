@@ -49,13 +49,20 @@ class HttpThread(threading.Thread):
 class RequestHandler(BaseHTTPRequestHandler):
     """HTTP 请求处理"""
 
+    alarm_history = []
+
     def do_GET(self):
         try:
             self.send_response(200, message=None)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
-            self.wfile.write(b'server running. ')
-            self.wfile.write(datetime.datetime.now().strftime('%Y-%m-%d, %H:%M:%S').encode())
+            self.wfile.write(datetime.datetime.now().strftime('<div>current time: %Y-%m-%d, %H:%M:%S</div>').encode())
+            self.wfile.write(b'<div>server running...</div>')
+            self.wfile.write(b'<div>...</div>')
+            self.wfile.write(b'<div>alarm history:</div>')
+            for timestamp, alarm_msg in self.alarm_history:
+                time_string = timestamp.strftime('%Y-%m-%d, %H:%M:%S')
+                self.wfile.write(('<div>%s, %s</div>' % (time_string, alarm_msg)).encode())
         except IOError:
             self.send_error(404, message=None)
 
@@ -70,4 +77,8 @@ class RequestHandler(BaseHTTPRequestHandler):
         length = int(self.headers['Content-Length'])
         post_data = urllib.parse.parse_qs(self.rfile.read(length).decode('utf-8'))
         if 'push_msg' in post_data:
-            warn.push(post_data['push_msg'][0])
+            push_msg = post_data['push_msg'][0]
+            self.alarm_history.append((datetime.datetime.now(), push_msg))
+            warn.push(push_msg)
+
+
