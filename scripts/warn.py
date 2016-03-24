@@ -90,7 +90,7 @@ class WarnToServerThread(threading.Thread):
             }
             data = urlencode(values).encode()
             req = rq.Request(self.server_url, data=data, headers=headers)
-            response = rq.urlopen(req)
+            response = rq.urlopen(req, timeout=5)
             log.debug('post to server: %s %s' % (response.status, response.reason))
         except Exception as e:
             log.error('post to server error: %s' % e)
@@ -133,7 +133,7 @@ class WarnPushThread(threading.Thread):
             }
             data = urlencode(values).encode()
             req = rq.Request(url, data=data, headers=headers)
-            response = rq.urlopen(req)
+            response = rq.urlopen(req, timeout=10)
             log.debug('push: %s %s' % (response.status, response.reason))
         except Exception as e:
             log.error('push error: %s' % e)
