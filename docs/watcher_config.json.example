@@ -1,9 +1,4 @@
 {
-  "heartBeatServer": {
-    "ipAddress": "127.0.0.1",
-    "port": 10000,
-    "interval": 40
-  },
   "httpServer": {
     "ipAddress": "127.0.0.1",
     "port": 10001
