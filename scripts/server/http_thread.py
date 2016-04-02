@@ -55,6 +55,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.send_response(200, message=None)
             self.send_header('Content-type', 'text/html')
             self.end_headers()
+            # header
             self.wfile.write(b'<html><head>')
             self.wfile.write(b'<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />')
             self.wfile.write(b'</head><body>')
@@ -62,7 +63,10 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(b'<div>server running...</div>')
             self.wfile.write(b'<div>...</div>')
             self.wfile.write(b'<div>alarm history:</div>')
-            for timestamp, alarm_msg in self.alarm_history:
+            # alarm body
+            alarm_history = self.alarm_history.copy()
+            alarm_history.reverse()
+            for timestamp, alarm_msg in alarm_history:
                 time_string = timestamp.strftime('%Y-%m-%d, %H:%M:%S')
                 self.wfile.write(('<div>%s, %s</div>' % (time_string, alarm_msg)).encode())
             self.wfile.write(b'<div>...</div>')
