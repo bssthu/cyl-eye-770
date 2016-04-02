@@ -88,6 +88,17 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.alarm_history.append((datetime.datetime.now(), push_msg))
             warn.push_jpush(push_msg)
 
+    def log_request(self, code='-', size='-'):
+        """覆盖基类方法，不输出到屏幕
+
+        This is called by send_response().
+
+        Args:
+            code: 状态码
+            size:
+        """
+        log.debug('%s - - "%s" %s %s' % (self.address_string(), self.requestline, str(code), str(size)))
+
 
 def decode_post_data(raw_data):
     """HTTP POST 内容解析
