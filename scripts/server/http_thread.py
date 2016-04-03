@@ -14,11 +14,12 @@ import log
 import warn
 
 
-heartbeat_timeout_count = 0
-
-
 class HttpThread(threading.Thread):
     """http 服务器，接收 POST 请求"""
+
+    heartbeat_timeout_count = 0
+    heartbeat_timeout_limit = 1
+    last_heartbeat_time = ''
 
     def __init__(self, http_config):
         """构造函数
@@ -28,13 +29,10 @@ class HttpThread(threading.Thread):
         """
         super().__init__()
         self.port = http_config['port']
-        self.heartbeat_timeout_limit = http_config['heartbeatTimeout']
+        HttpThread.heartbeat_timeout_limit = http_config['heartbeatTimeout']
 
         self.server = None
         self.running = True
-
-        global heartbeat_timeout_count
-        heartbeat_timeout_count = 0
 
     def run(self):
         """线程主函数
@@ -59,10 +57,9 @@ class HttpThread(threading.Thread):
     def heartbeat_count_increase(self):
         """检查心跳超时的定时器函数"""
         # 计数
-        global heartbeat_timeout_count
-        heartbeat_timeout_count += 1
+        HttpThread.heartbeat_timeout_count += 1
         # 超时判断与处理
-        if heartbeat_timeout_count == self.heartbeat_timeout_limit:
+        if HttpThread.heartbeat_timeout_count == HttpThread.heartbeat_timeout_limit:
             log.warning('listen thread: heartbeat timeout')
             warn.push('与客户端的连接超时')
         # 继续定时检查
@@ -90,16 +87,22 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(b'<html><head>')
             self.wfile.write(b'<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />')
             self.wfile.write(b'</head><body>')
-            self.wfile.write(datetime.datetime.now().strftime('<div>current time: %Y-%m-%d, %H:%M:%S</div>').encode())
+            self.wfile.write(('<div>current time: %s</div>' % get_time_string()).encode())
             self.wfile.write(b'<div>server running...</div>')
             self.wfile.write(b'<div>...</div>')
-            self.wfile.write(b'<div>alarm history:</div>')
+            # heartbeat status
+            if HttpThread.heartbeat_timeout_count < HttpThread.heartbeat_timeout_limit:
+                self.wfile.write(b'<div>heartbeat ok</div>')
+            else:
+                self.wfile.write(b'<div>heartbeat timeout</div>')
+            self.wfile.write(('<div>last heartbeat time: %s</div>' % HttpThread.last_heartbeat_time).encode())
+            self.wfile.write(b'<div>...</div>')
             # alarm body
+            self.wfile.write(b'<div>alarm history:</div>')
             alarm_history = self.alarm_history.copy()
             alarm_history.reverse()
             for timestamp, alarm_msg in alarm_history:
-                time_string = timestamp.strftime('%Y-%m-%d, %H:%M:%S')
-                self.wfile.write(('<div>%s, %s</div>' % (time_string, alarm_msg)).encode())
+                self.wfile.write(('<div>%s, %s</div>' % (get_time_string(), alarm_msg)).encode())
             self.wfile.write(b'<div>...</div>')
             self.wfile.write(b'</body></html>')
         except IOError:
@@ -122,8 +125,8 @@ class RequestHandler(BaseHTTPRequestHandler):
             warn.push_jpush(push_msg)
         if heartbeat_msg is not None and str(heartbeat_msg).startswith('@'*10):
             # is heartbeat message
-            global heartbeat_timeout_count
-            heartbeat_timeout_count = 0
+            HttpThread.heartbeat_timeout_count = 0
+            HttpThread.last_heartbeat_time = get_time_string()
 
     def log_request(self, code='-', size='-'):
         """覆盖基类方法，不输出到屏幕
@@ -168,3 +171,7 @@ def decode_post_data(raw_data):
         heartbeat_msg = post_data['heartbeat_msg'][0]
 
     return push_msg, heartbeat_msg
+
+
+def get_time_string():
+    return datetime.datetime.now().strftime('%Y-%m-%d, %H:%M:%S')
