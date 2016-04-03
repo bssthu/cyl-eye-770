@@ -102,7 +102,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             alarm_history = self.alarm_history.copy()
             alarm_history.reverse()
             for timestamp, alarm_msg in alarm_history:
-                self.wfile.write(('<div>%s, %s</div>' % (get_time_string(), alarm_msg)).encode())
+                self.wfile.write(('<div>%s, %s</div>' % (timestamp, alarm_msg)).encode())
             self.wfile.write(b'<div>...</div>')
             self.wfile.write(b'</body></html>')
         except IOError:
