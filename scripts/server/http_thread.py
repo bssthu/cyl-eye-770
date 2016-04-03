@@ -122,7 +122,6 @@ class RequestHandler(BaseHTTPRequestHandler):
         if push_msg is not None:
             # is push message
             self.alarm_history.append((datetime.datetime.now(), push_msg))
-            warn.push_jpush(push_msg)
         if heartbeat_msg is not None and str(heartbeat_msg).startswith('@'*10):
             # is heartbeat message
             HttpThread.heartbeat_timeout_count = 0
