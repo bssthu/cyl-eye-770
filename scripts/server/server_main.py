@@ -11,7 +11,6 @@ import os.path
 import log
 import warn
 import server
-from server.listen_thread import ListenThread
 from server.http_thread import HttpThread
 
 
@@ -32,11 +31,9 @@ def load_config(config_file_name):
         return None
 
     # check
-    if 'heartBeatServer' in configs \
-            and 'port' in configs['heartBeatServer'] \
-            and 'timeout' in configs['heartBeatServer'] \
-            and 'httpServer' in configs \
+    if 'httpServer' in configs \
             and 'port' in configs['httpServer'] \
+            and 'heartbeatTimeout' in configs['httpServer'] \
             and 'jpush' in configs \
             and 'appKey' in configs['jpush'] \
             and 'masterSecret' in configs['jpush'] \
@@ -66,10 +63,7 @@ def main():
     warn.initialize_warn(configs['jpush'], warn_server_config)
 
     # threads
-    heartbeat_listener = ListenThread(configs['heartBeatServer'])
     http_server = HttpThread(configs['httpServer'])
-
-    heartbeat_listener.start()
     http_server.start()
 
     # keyboard
@@ -81,8 +75,6 @@ def main():
         pass
 
     # quit & clean up
-    heartbeat_listener.running = False
-    heartbeat_listener.join()
     http_server.running = False
     http_server.shutdown()
     http_server.join()
