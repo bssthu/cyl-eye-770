@@ -34,9 +34,6 @@ def load_config(config_file_name):
     if 'httpServer' in configs \
             and 'port' in configs['httpServer'] \
             and 'heartbeatTimeout' in configs['httpServer'] \
-            and 'jpush' in configs \
-            and 'appKey' in configs['jpush'] \
-            and 'masterSecret' in configs['jpush'] \
             and 'enableLog' in configs:
         return configs
     else:
@@ -60,7 +57,7 @@ def main():
     log.initialize_logging('server', log_path, configs['enableLog'].lower() == 'true')
     log.info('server main: start')
     warn_server_config = {'ipAddress': '127.0.0.1', 'port': configs['httpServer']['port']}
-    warn.initialize_warn(configs['jpush'], warn_server_config)
+    warn.initialize_warn(warn_server_config)
 
     # threads
     http_server = HttpThread(configs['httpServer'])

@@ -41,9 +41,6 @@ def load_config(config_file_name):
             and 'watchPath' in configs['email'] \
             and 'fileExt' in configs['email'] \
             and 'fileNum' in configs['email'] \
-            and 'jpush' in configs \
-            and 'appKey' in configs['jpush'] \
-            and 'masterSecret' in configs['jpush'] \
             and 'enableLog' in configs:
         return configs
     else:
@@ -66,7 +63,7 @@ def main():
     log_path = os.path.abspath(os.path.join(root_dir, 'logs'))
     log.initialize_logging('watcher', log_path, configs['enableLog'].lower() == 'true')
     log.info('watcher main: start')
-    warn.initialize_warn(configs['jpush'], configs['httpServer'])
+    warn.initialize_warn(configs['httpServer'])
 
     # threads
     mail_sender = MailSenderThread(configs['email'])

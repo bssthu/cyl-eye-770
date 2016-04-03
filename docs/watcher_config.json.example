@@ -12,9 +12,5 @@
     "fileExt": "log",
     "fileNum": 2
   },
-  "jpush": {
-    "appKey": "abc",
-    "masterSecret": "def"
-  },
   "enableLog": "true"
 }
