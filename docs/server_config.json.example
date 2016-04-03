@@ -1,7 +1,7 @@
 {
-  "jpush": {
-    "appKey": "abc",
-    "masterSecret": "def"
+  "httpServer": {
+    "port": 10001,
+    "heartbeatTimeout": 300
   },
   "enableLog": "true"
 }
