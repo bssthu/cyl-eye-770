@@ -87,14 +87,14 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(b'<html><head>')
             self.wfile.write(b'<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />')
             self.wfile.write(b'</head><body>')
-            self.wfile.write(('<div>current time: %s</div>' % get_time_string()).encode())
+            self.wfile.write(('<div>server time: %s</div>' % get_time_string()).encode())
             self.wfile.write(b'<div>server running...</div>')
             self.wfile.write(b'<div>...</div>')
             # heartbeat status
             if HttpThread.heartbeat_timeout_count < HttpThread.heartbeat_timeout_limit:
-                self.wfile.write(b'<div>heartbeat ok</div>')
+                self.wfile.write(b'<div>heartbeat state: ok</div>')
             else:
-                self.wfile.write(b'<div>heartbeat timeout</div>')
+                self.wfile.write(b'<div>heartbeat state: timeout</div>')
             self.wfile.write(('<div>last heartbeat time: %s</div>' % HttpThread.last_heartbeat_time).encode())
             self.wfile.write(b'<div>...</div>')
             # alarm body
