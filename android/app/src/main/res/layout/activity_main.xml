@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+    <RelativeLayout android:layout_width="fill_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_height="fill_parent" >
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dip" >
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            
+             />
+        <TextView
+            android:id="@+id/server_time"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dip"
+              />
+        <TextView
+            android:id="@+id/heartbeat_state"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dip"
+              />
+         <TextView
+            android:id="@+id/last_heartbeat_time"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dip"
+              />
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dip"
+            android:text="last alarm:" />
+
+        <TextView
+            android:id="@+id/last_alarm"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dip"
+              />
+
+        <Button
+            android:id="@+id/stop"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dip"
+            android:text="stop"
+            android:onClick="unregisterMessageReceiver" />
+
+        <Button
+            android:id="@+id/resume"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dip"
+            android:text="resume"
+            android:onClick="registerMessageReceiver" />
+
+        <Button
+            android:id="@+id/refresh"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dip"
+            android:text="refresh"
+            android:onClick="refresh" />
+
+    </LinearLayout>
+</RelativeLayout>

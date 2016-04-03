@@ -1,0 +1,34 @@
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+/build
+/captures
+/app/build
+.idea/*
+*.iml
+gradle.properties
+
+#built application files
+*.apk
+*.ap_
+!gradle/wrapper/gradle-wrapper.jar
+
+# files for the dex VM
+*.dex
+
+# Java class files
+*.class
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Windows thumbnail db
+Thumbs.db
+
+# OSX files
+.DS_Store
+
+# Linux files
+*~
+*.swp
