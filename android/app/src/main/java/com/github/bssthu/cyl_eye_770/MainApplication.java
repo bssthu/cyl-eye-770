@@ -27,7 +27,7 @@ public class MainApplication extends Application {
 
 
     // 注册广播接收
-    public static void registerMessageReceiver(Context context) {
+    public static void registerMessageReceiver(final Context context) {
         if (receiver == null) {
             receiver = new MessageReceiver();
         }
@@ -38,8 +38,9 @@ public class MainApplication extends Application {
         context.registerReceiver(receiver, filter);
     }
 
+
     // 取消广播接收
-    public static void unregisterMessageReceiver(Context context) {
+    public static void unregisterMessageReceiver(final Context context) {
         try {
             context.unregisterReceiver(receiver);
         } catch (IllegalArgumentException ignore) { }

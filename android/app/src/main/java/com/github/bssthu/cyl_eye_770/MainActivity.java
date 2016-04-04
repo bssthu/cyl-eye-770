@@ -41,6 +41,9 @@ public class MainActivity extends Activity {
         IntentFilter filter = new IntentFilter();
         filter.addAction(ACTION_UPDATE_UI);
         LocalBroadcastManager.getInstance(context).registerReceiver(uiReceiver, filter);
+
+        // refresh
+        WatcherUtil.checkAlarm(context);
     }
 
 
