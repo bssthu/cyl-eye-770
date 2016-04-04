@@ -31,9 +31,10 @@ public class MainApplication extends Application {
         if (receiver == null) {
             receiver = new MessageReceiver();
         }
+        unregisterMessageReceiver(context);
 
         IntentFilter filter = new IntentFilter();
-        filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);
+        filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);      // 设定最高优先级，慎用
         filter.addAction(Intent.ACTION_TIME_TICK);
         context.registerReceiver(receiver, filter);
     }
