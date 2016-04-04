@@ -1,8 +1,6 @@
 package com.github.bssthu.cyl_eye_770;
 
 import android.app.Application;
-import android.content.Context;
-import android.content.Intent;
 import android.content.res.AssetManager;
 
 import java.io.InputStream;
@@ -19,11 +17,7 @@ public class MainApplication extends Application {
         loadProperties();
 
         // start watcher service
-        Context context = this;
-        if (WatcherService.keepAlive(context)) {
-            Intent intent = new Intent(context, WatcherService.class);
-            startService(intent);
-        }
+        WatcherService.restartService(this);
 
         super.onCreate();
     }

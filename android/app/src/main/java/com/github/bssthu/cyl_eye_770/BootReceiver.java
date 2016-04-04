@@ -11,9 +11,6 @@ import android.content.Intent;
 public class BootReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        if (WatcherService.keepAlive(context)) {
-            Intent serviceIntent = new Intent(context, WatcherService.class);
-            context.startService(serviceIntent);
-        }
+        WatcherService.restartService(context);
     }
 }

@@ -9,6 +9,7 @@ import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NotificationCompat;
 
@@ -17,6 +18,7 @@ public class WatcherService extends Service {
 
     private Context context;
     private MessageReceiver receiver = null;
+    private PowerManager.WakeLock wakeLock = null;
 
     // service 是否保持运行
     public static boolean keepAlive(Context context) {
@@ -28,6 +30,13 @@ public class WatcherService extends Service {
         SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
         editor.putBoolean(keepAliveKey, keepAlive);
         editor.apply();
+    }
+
+    public static void restartService(Context context) {
+        if (keepAlive(context)) {
+            Intent intent = new Intent(context, WatcherService.class);
+            context.startService(intent);
+        }
     }
 
     public WatcherService() {
@@ -63,6 +72,11 @@ public class WatcherService extends Service {
         notificationManager.notify(1, notification);
         startForeground(1, notification);
 
+        // wakelock
+        PowerManager powerManager = (PowerManager) getSystemService(POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "WatcherService");
+        wakeLock.acquire();
+
         // start sticky
         flags = START_STICKY;
         return super.onStartCommand(intent, flags, startId);
@@ -91,6 +105,14 @@ public class WatcherService extends Service {
     @Override
     public void onDestroy() {
         stopForeground(true);
+        wakeLock.release();
+
+        // send broadcast to restart
+        if (keepAlive(context)) {
+            Intent intent = new Intent("com.github.bssthu.cyl_eye_770.restart_service");
+            sendBroadcast(intent);
+        }
+
         super.onDestroy();
     }
 }
