@@ -7,7 +7,7 @@
     <!-- 震动 -->
     <uses-permission android:name="android.permission.VIBRATE" />
     <!-- 接收开机广播 -->
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
         android:name=".MainApplication"
@@ -24,14 +24,17 @@
             </intent-filter>
         </activity>
 
-        <receiver
-            android:name="com.github.bssthu.cyl_eye_770.BootReceiver">
-            <intent-filter >
-                <action android:name="android.intent.action.BOOT_COMPLETED"/>
-                <action android:name="android.intent.action.USER_PRESENT"/>
+        <receiver android:name=".BootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.USER_PRESENT" />
             </intent-filter>
         </receiver>
 
+        <service
+            android:name=".WatcherService"
+            android:enabled="true"
+            android:exported="true"></service>
     </application>
 
 </manifest>

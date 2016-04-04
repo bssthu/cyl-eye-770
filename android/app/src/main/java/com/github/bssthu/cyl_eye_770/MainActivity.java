@@ -94,12 +94,18 @@ public class MainActivity extends Activity {
 
     // 注册广播接收
     public void registerMessageReceiver(View view) {
-        MainApplication.registerMessageReceiver(context);
+        WatcherService.setKeepAlive(context, true);
+
+        Intent intent = new Intent(context, WatcherService.class);
+        startService(intent);
     }
 
     // 取消广播接收
     public void unregisterMessageReceiver(View view) {
-        MainApplication.unregisterMessageReceiver(context);
+        WatcherService.setKeepAlive(context, false);
+
+        Intent intent = new Intent(context, WatcherService.class);
+        stopService(intent);
     }
 
 

@@ -90,7 +90,7 @@ public class WatcherUtil {
                 .setWhen(System.currentTimeMillis())
                 .setVibrate(new long[] {0, 500, 500, 1500})
                 .setSmallIcon(R.drawable.ic_launcher);
-        notificationManager.notify(1, builder.build());
+        notificationManager.notify(2, builder.build());
     }
 
 

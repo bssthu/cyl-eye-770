@@ -3,7 +3,6 @@ package com.github.bssthu.cyl_eye_770;
 import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.res.AssetManager;
 
 import java.io.InputStream;
@@ -15,36 +14,18 @@ import java.util.Properties;
 public class MainApplication extends Application {
     static String serverAddress = "http://localhost";
 
-    static MessageReceiver receiver = null;
-
     @Override
     public void onCreate() {
         loadProperties();
-        registerMessageReceiver(getApplicationContext());
+
+        // start watcher service
+        Context context = this;
+        if (WatcherService.keepAlive(context)) {
+            Intent intent = new Intent(context, WatcherService.class);
+            startService(intent);
+        }
 
         super.onCreate();
-    }
-
-
-    // 注册广播接收
-    public static void registerMessageReceiver(final Context context) {
-        if (receiver == null) {
-            receiver = new MessageReceiver();
-        }
-        unregisterMessageReceiver(context);
-
-        IntentFilter filter = new IntentFilter();
-        filter.setPriority(IntentFilter.SYSTEM_HIGH_PRIORITY);      // 设定最高优先级，慎用
-        filter.addAction(Intent.ACTION_TIME_TICK);
-        context.registerReceiver(receiver, filter);
-    }
-
-
-    // 取消广播接收
-    public static void unregisterMessageReceiver(final Context context) {
-        try {
-            context.unregisterReceiver(receiver);
-        } catch (IllegalArgumentException ignore) { }
     }
 
 
