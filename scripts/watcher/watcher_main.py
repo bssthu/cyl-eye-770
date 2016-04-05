@@ -43,6 +43,7 @@ def load_config(config_file_name):
             and 'fileExt' in configs['email'] \
             and 'fileNum' in configs['email'] \
             and 'files' in configs \
+            and 'dateFormat' in configs['files'] \
             and 'interval' in configs['files'] \
             and 'alarmPath' in configs['files'] \
             and 'heartbeatPath' in configs['files'] \

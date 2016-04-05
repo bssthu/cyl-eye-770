@@ -11,6 +11,7 @@ import threading
 import time
 import log
 import warn
+from watcher.heartbeat_sender_thread import HeartbeatSenderThread
 
 
 class FileCheckerThread(threading.Thread):
@@ -27,6 +28,7 @@ class FileCheckerThread(threading.Thread):
         super().__init__()
         self.server_url = 'http://%s:%d/' % (http_config['ipAddress'], http_config['port'])
         self.interval = file_config['interval']
+        self.date_format = file_config['dateFormat']
         self.alarm_path = file_config['alarmPath']
         self.heartbeat_path = file_config['heartbeatPath']
 
@@ -80,7 +82,12 @@ class FileCheckerThread(threading.Thread):
             with open(self.heartbeat_path, 'r') as fp:
                 line = fp.readline()
             if line is not None:
-                # TODO: check heartbeat
+                date = datetime.datetime.strptime(line, self.date_format)
+                # 文件中的时间戳更新，则向 server 发送心跳
+                if date > self.heartbeat_check_time:
+                    HeartbeatSenderThread(self.server_url).start()
+                # update timestamp
+                self.heartbeat_check_time = datetime.datetime.now()
                 return True
         except Exception as e:
             log.error('file checker error when check heartbeat: %s' % e)
