@@ -75,6 +75,8 @@ class FileCheckerThread(threading.Thread):
     def check_heartbeat(self):
         """检查心跳信息
 
+        检查文件中的时间戳，如果文件中的比较新，则发送心跳包。
+
         Returns:
             是否成功
         """
@@ -83,7 +85,7 @@ class FileCheckerThread(threading.Thread):
                 line = fp.readline()
             if line is not None:
                 date = datetime.datetime.strptime(line, self.date_format)
-                # 文件中的时间戳更新，则向 server 发送心跳
+                # 文件中的时间戳较新，则向 server 发送心跳
                 if date > self.heartbeat_check_time:
                     HeartbeatSenderThread(self.server_url).start()
                 # update timestamp
@@ -96,15 +98,34 @@ class FileCheckerThread(threading.Thread):
     def check_alarm(self):
         """检查报警信息
 
+        检查每条警报的时间戳
+
         Returns:
             是否成功
         """
         try:
+            alarms = []
             with open(self.alarm_path, 'r') as fp:
-                line = fp.readline()
-            if line is not None:
-                # TODO: check alarm
-                return True
+                for line in fp:
+                    line = line.strip()
+                    if line == '':
+                        continue
+                    # TODO: check alarm
+                    words = line.split('\t', 1)
+                    if len(words) == 2:
+                        date = datetime.datetime.strptime(words[0], self.date_format)
+                        # 这条警报的时间戳较新，则向 server 发送该警报
+                        if date > self.heartbeat_check_time:
+                            alarms.append(words[1].strip())
+            # 发送新的警报信息
+            if len(alarms) > 0:
+                # update timestamp
+                self.alarm_check_time = datetime.datetime.now()
+                # send
+                alarms.reverse()
+                for alarm in alarms:
+                    warn.push(alarm)
         except Exception as e:
             log.error('file checker error when check alarm: %s' % e)
-        return False
+            return False
+        return True
