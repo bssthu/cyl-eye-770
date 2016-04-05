@@ -8,6 +8,7 @@
 
 import datetime
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from socketserver import ThreadingMixIn
 import threading
 import urllib.parse
 import log
@@ -42,7 +43,7 @@ class HttpThread(threading.Thread):
         """
         log.info('http thread: start, port: %d' % self.port)
 
-        self.server = HTTPServer(('', self.port), RequestHandler)
+        self.server = ThreadingHTTPServer(('', self.port), RequestHandler)
 
         self.start_heartbeat_timer()
         self.server.serve_forever()
@@ -71,6 +72,11 @@ class HttpThread(threading.Thread):
         if self.server is not None:
             self.server.shutdown()
         self.running = False
+
+
+class ThreadingHTTPServer(ThreadingMixIn, HTTPServer):
+    """支持多线程"""
+    pass
 
 
 class RequestHandler(BaseHTTPRequestHandler):
