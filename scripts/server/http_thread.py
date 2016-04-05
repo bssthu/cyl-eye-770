@@ -93,7 +93,7 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.wfile.write(b'<html><head>')
             self.wfile.write(b'<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />')
             self.wfile.write(b'</head><body>')
-            self.wfile.write(('<div>server time: %s</div>' % get_time_string(datetime.datetime.now())).encode())
+            self.wfile.write(('<div>server time: %s</div>' % get_time_string()).encode())
             self.wfile.write(b'<div>server running...</div>')
             self.wfile.write(b'<div>...</div>')
             # heartbeat status
@@ -178,5 +178,7 @@ def decode_post_data(raw_data):
     return push_msg, heartbeat_msg
 
 
-def get_time_string(timestamp):
+def get_time_string(timestamp=None):
+    if timestamp is None:
+        timestamp = datetime.datetime.now()
     return timestamp.strftime('%Y-%m-%d, %H:%M:%S')
