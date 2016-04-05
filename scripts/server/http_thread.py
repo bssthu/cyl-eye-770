@@ -84,6 +84,11 @@ class RequestHandler(BaseHTTPRequestHandler):
 
     alarm_history = []
 
+    def __init__(self, request, client_address, server):
+        """设置超时"""
+        self.timeout = 20
+        BaseHTTPRequestHandler.__init__(self, request, client_address, server)
+
     def do_GET(self):
         try:
             self.send_response(200, message=None)
