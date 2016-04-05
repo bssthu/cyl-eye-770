@@ -6,6 +6,7 @@
 # Description   : 
 # 
 
+import datetime
 import threading
 import time
 import log
@@ -13,7 +14,7 @@ import warn
 
 
 class FileCheckerThread(threading.Thread):
-    """查找待发文件并发送邮件的线程"""
+    """通过文件系统检查报警信息、心跳信息的线程"""
 
     def __init__(self, http_config, file_config):
         """构造函数
@@ -22,44 +23,43 @@ class FileCheckerThread(threading.Thread):
             http_config: 服务器配置信息
             file_config: 文件监视信息
         """
+
         super().__init__()
         self.server_url = 'http://%s:%d/' % (http_config['ipAddress'], http_config['port'])
         self.interval = file_config['interval']
         self.alarm_path = file_config['alarmPath']
         self.heartbeat_path = file_config['heartbeatPath']
+
+        self.alarm_check_time = datetime.datetime.now()     # 最近一次检查的时刻
+        self.heartbeat_check_time = self.alarm_check_time
         self.running = True
 
     def run(self):
         """线程主函数
 
         循环运行，每隔一定时间，检查报警信息、心跳信息文件。
+
+        文件中带有时间戳。比较文件中的时间戳与上次检查时间，可以判断是否收到了新的信息。
         """
 
-        # check
         log.info('file checker: start')
 
         last_heartbeat_check_ok = True
         last_alarm_check_ok = True
 
-        # send & wait
+        # loop & check
         while self.running:
-            try:
-                self.check_heartbeat()
-            except Exception as e:
-                log.error('file checker error: %s' % e)
-                if last_heartbeat_check_ok:
-                    warn.push('file checker: 心跳包查询失败')
-                    last_heartbeat_check_ok = False
+            # heartbeat
+            if not self.check_heartbeat() and last_heartbeat_check_ok:  # 刚刚失败
+                warn.push('file checker: 心跳包查询失败')
+                last_heartbeat_check_ok = False
             else:
                 last_heartbeat_check_ok = True
 
-            try:
-                self.check_alarm()
-            except Exception as e:
-                log.error('file checker error: %s' % e)
-                if last_alarm_check_ok:
-                    warn.push('file checker: 报警信息查询失败')
-                    last_alarm_check_ok = False
+            # alarm
+            if not self.check_alarm() and last_alarm_check_ok:
+                warn.push('file checker: 报警信息查询失败')
+                last_alarm_check_ok = False
             else:
                 last_alarm_check_ok = True
 
@@ -71,13 +71,33 @@ class FileCheckerThread(threading.Thread):
         log.info('file checker: bye')
 
     def check_heartbeat(self):
-        """检查心跳信息"""
-        with open(self.heartbeat_path, 'r') as fp:
-            # TODO: check heartbeat
-            pass
+        """检查心跳信息
+
+        Returns:
+            是否成功
+        """
+        try:
+            with open(self.heartbeat_path, 'r') as fp:
+                line = fp.readline()
+            if line is not None:
+                # TODO: check heartbeat
+                return True
+        except Exception as e:
+            log.error('file checker error when check heartbeat: %s' % e)
+        return False
 
     def check_alarm(self):
-        """检查报警信息"""
-        with open(self.alarm_path, 'r') as fp:
-            # TODO: check alarm
-            pass
+        """检查报警信息
+
+        Returns:
+            是否成功
+        """
+        try:
+            with open(self.alarm_path, 'r') as fp:
+                line = fp.readline()
+            if line is not None:
+                # TODO: check alarm
+                return True
+        except Exception as e:
+            log.error('file checker error when check alarm: %s' % e)
+        return False
