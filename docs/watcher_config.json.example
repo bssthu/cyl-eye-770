@@ -12,5 +12,10 @@
     "fileExt": "log",
     "fileNum": 2
   },
+  "files": {
+    "interval": 40,
+    "alarmPath": "./alarm.txt",
+    "heartbeatPath": "./heartbeat.txt"
+  },
   "enableLog": "true"
 }

@@ -11,6 +11,7 @@ import os.path
 import log
 import warn
 import watcher
+from watcher.file_checker_thread import FileCheckerThread
 from watcher.mail_sender_thread import MailSenderThread
 
 
@@ -41,6 +42,10 @@ def load_config(config_file_name):
             and 'watchPath' in configs['email'] \
             and 'fileExt' in configs['email'] \
             and 'fileNum' in configs['email'] \
+            and 'files' in configs \
+            and 'interval' in configs['files'] \
+            and 'alarmPath' in configs['files'] \
+            and 'heartbeatPath' in configs['files'] \
             and 'enableLog' in configs:
         return configs
     else:
@@ -67,7 +72,10 @@ def main():
 
     # threads
     mail_sender = MailSenderThread(configs['email'])
+    file_checker = FileCheckerThread(configs['httpServer'], configs['files'])
+
     mail_sender.start()
+    file_checker.start()
 
     # keyboard
     try:
@@ -79,6 +87,9 @@ def main():
 
     # quit & clean up
     mail_sender.running = False
+    file_checker.running = False
+
     mail_sender.join()
+    file_checker.join()
 
     log.info('watcher main: bye')
