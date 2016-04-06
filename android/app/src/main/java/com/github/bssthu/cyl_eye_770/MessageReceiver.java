@@ -12,6 +12,7 @@ public class MessageReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (Intent.ACTION_TIME_TICK.equals(intent.getAction())) {
+            WatcherService.restartService(context);
             WatcherUtil.checkAlarm(context);
         }
     }
