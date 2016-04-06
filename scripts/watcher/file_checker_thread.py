@@ -110,12 +110,11 @@ class FileCheckerThread(threading.Thread):
                     line = line.strip()
                     if line == '':
                         continue
-                    # TODO: check alarm
                     words = line.split('\t', 1)
                     if len(words) == 2:
                         date = datetime.datetime.strptime(words[0], self.date_format)
                         # 这条警报的时间戳较新，则向 server 发送该警报
-                        if date > self.heartbeat_check_time:
+                        if date > self.alarm_check_time:
                             alarms.append(words[1].strip())
             # 发送新的警报信息
             if len(alarms) > 0:
