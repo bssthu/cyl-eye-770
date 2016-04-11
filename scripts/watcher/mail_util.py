@@ -49,13 +49,17 @@ def zip_files(watch_path, files_to_send):
     Raises:
         Exception if watch_path is not dir
     """
+    if len(files_to_send) == 0:
+        return
+
     if not os.path.isdir(watch_path):
         raise Exception('%s is not a dir.' % watch_path)
 
     zip_file = os.path.abspath(os.path.join(watch_path, files_to_send[0] + '.zip'))
     f = zipfile.ZipFile(zip_file, 'w', zipfile.ZIP_DEFLATED)
     for file_name in files_to_send:
-        f.write(file_name, os.path.basename(file_name))
+        if os.path.isfile(file_name):
+            f.write(file_name, os.path.basename(file_name))
     f.close()
     return zip_file
 

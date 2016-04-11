@@ -10,6 +10,7 @@
     "smtpServer": "smtp.foo.bar",
     "interval": 1800,
     "watchPath": "./",
+    "extraWatchFiles": [],
     "fileExt": "log",
     "fileNum": 2
   },

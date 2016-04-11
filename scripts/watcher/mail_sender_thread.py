@@ -28,6 +28,10 @@ class MailSenderThread(threading.Thread):
         self.smtp_server = email_config['smtpServer']
         self.interval = email_config['interval']
         self.watch_path = email_config['watchPath']
+        if 'extraWatchFiles' in email_config and isinstance(email_config['extraWatchFiles'], list):
+            self.extra_watch_files = email_config['extraWatchFiles']
+        else:
+            self.extra_watch_files = []
         self.file_ext = email_config['fileExt']
         self.file_num = email_config['fileNum']
         self.running = True
@@ -67,6 +71,9 @@ class MailSenderThread(threading.Thread):
 
         # 查找文件
         files_to_send = mail_util.find_files(self.watch_path, self.file_ext, self.file_num)
+        files_to_send.extend(self.extra_watch_files)
+        if len(files_to_send) == 0:
+            return
         # 压缩打包
         zip_file = mail_util.zip_files(self.watch_path, files_to_send)
         # 发送邮件
