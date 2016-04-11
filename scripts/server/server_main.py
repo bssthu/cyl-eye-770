@@ -72,6 +72,7 @@ def main():
         pass
 
     # quit & clean up
+    warn.stop_warn()
     http_server.running = False
     http_server.shutdown()
     http_server.join()

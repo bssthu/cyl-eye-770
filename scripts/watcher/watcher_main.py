@@ -92,5 +92,6 @@ def main():
 
     mail_sender.join()
     file_checker.join()
+    warn.stop_warn()
 
     log.info('watcher main: bye')
