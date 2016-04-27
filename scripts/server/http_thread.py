@@ -135,7 +135,9 @@ class RequestHandler(BaseHTTPRequestHandler):
             self.alarm_history.append((datetime.datetime.now(), push_msg))
         if heartbeat_msg is not None and str(heartbeat_msg).startswith('@'*10):
             # is heartbeat message
-            HttpThread.heartbeat_timeout_count = 0
+            if HttpThread.heartbeat_timeout_count >= HttpThread.heartbeat_timeout_limit:
+                log.info('listen thread: heartbeat reconnected')
+            HttpThread.heartbeat_timeout_count = 0  # clear count
             HttpThread.last_heartbeat_time = get_time_string()
 
     def log_request(self, code='-', size='-'):
