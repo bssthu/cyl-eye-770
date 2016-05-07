@@ -1,0 +1,8 @@
+{
+  "email": {
+    "name": "abc@def.com",
+    "password": "def",
+    "imapServer": "imap.foo.bar"
+  },
+  "attachmentPath": "./"
+}

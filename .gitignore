@@ -65,6 +65,7 @@ target/
 .*.swp
 
 .idea/
+temp/
 
 *.json
 *.log
