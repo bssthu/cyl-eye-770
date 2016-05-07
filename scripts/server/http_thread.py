@@ -151,6 +151,10 @@ class RequestHandler(BaseHTTPRequestHandler):
         """
         log.debug('%s - - "%s" %s %s' % (self.address_string(), self.requestline, str(code), str(size)))
 
+    def log_error(self, format, *args):
+        """覆盖基类方法，不输出到屏幕"""
+        log.debug('%s - - "%s" %s' % (self.address_string(), self.requestline, format % args))
+
 
 def decode_post_data(raw_data):
     """HTTP POST 内容解析
