@@ -2,7 +2,8 @@
   "email": {
     "name": "abc@def.com",
     "password": "def",
-    "imapServer": "imap.foo.bar"
+    "imapServer": "imap.foo.bar",
+    "criteria": "(SINCE '01-Jan-2000')"
   },
   "attachmentPath": "./"
 }
