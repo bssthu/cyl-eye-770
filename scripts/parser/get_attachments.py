@@ -8,6 +8,7 @@
 
 import imaplib
 import email
+import hashlib
 from load_parser_config import *
 
 
@@ -61,36 +62,60 @@ def get_mail(host, port, user, password, criteria, attachment_path):
         return
 
     # 遍历列表
+    parsed_files = []
     for mail_id in mail_ids:
         try:
             typ, data = conn.fetch(mail_id, '(RFC822)')
             msg = email.message_from_bytes(data[0][1])
-            parse_email_and_save_attachments(msg, attachment_path)   # 解析，下载附件
+            parse_email_and_save_attachments(msg, attachment_path, parsed_files)   # 解析，下载附件
         except Exception as e:
             print('failed to get attachment(s) from mail %s: %s' % (mail_id, e))
             continue
 
 
-def parse_email_and_save_attachments(msg, path):
-    """解析一封邮件，下载附件
+def parse_email_and_save_attachments(msg, path, parsed_files):
+    """解析一封邮件，下载附件。
+    若有同名附件，则下载最新。
+    若下载前已存在同名文件，则比较，如果不同则覆盖。
 
     Args:
         msg: 邮件内容
         path: 附件保存路径
+        parsed_files: 已下载或检查的附件名
     """
+
     for part in msg.walk():
         if not part.is_multipart():
             filename = part.get_filename()
 
             # if is attachment
             if filename is not None:
-                print(filename)
-                # download attachment
-                content = part.get_payload(decode=True)
-                # save file
-                fp = open(os.path.join(path, filename), 'wb')
-                fp.write(content)
-                fp.close()
+                # get newest if attachments have same name
+                if filename not in parsed_files:
+                    parsed_files.append(filename)
+
+                    # download attachment
+                    content = part.get_payload(decode=True)
+                    file_hash = hashlib.md5(content).hexdigest()
+
+                    # compare
+                    abspath = os.path.join(path, filename)
+                    if os.path.isfile(abspath):
+                        fp = open(abspath, 'rb')
+                        current_hash = hashlib.md5(fp.read()).hexdigest()
+                        fp.close()
+                        # 去重
+                        if file_hash == current_hash:
+                            continue
+
+                    # save file
+                    try:
+                        fp = open(abspath, 'wb')
+                        fp.write(content)
+                        fp.close()
+                        print('save %s' % filename)
+                    except IOError as e:
+                        print('failed to download file %s: %s' % (filename, e))
 
 
 def main():
