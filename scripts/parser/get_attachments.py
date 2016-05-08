@@ -65,12 +65,30 @@ def get_mail(host, port, user, password, criteria, attachment_path):
     parsed_files = []
     for mail_id in mail_ids:
         try:
-            typ, data = conn.fetch(mail_id, '(RFC822)')
-            msg = email.message_from_bytes(data[0][1])
-            parse_email_and_save_attachments(msg, attachment_path, parsed_files)   # 解析，下载附件
+            typ, data = conn.fetch(mail_id, 'BODYSTRUCTURE')
+            if exists_new_attachment_name(data[0].decode(), parsed_files):
+                typ, data = conn.fetch(mail_id, '(RFC822)')
+                msg = email.message_from_bytes(data[0][1])
+                parse_email_and_save_attachments(msg, attachment_path, parsed_files)   # 解析，下载附件
         except Exception as e:
             print('failed to get attachment(s) from mail %s: %s' % (mail_id, e))
             continue
+
+
+def exists_new_attachment_name(bodystructure, parsed_files):
+    """判断是否存在新附件名
+
+    Args:
+        bodystructure: A parsed representation of the [MIME-IMB] body structure
+                       information of the message.
+        parsed_files: 已下载或检查的附件名
+    """
+    words = bodystructure.split('"')
+    for i in range(0, len(words) - 2):
+        if words[i] == 'FILENAME':
+            if words[i + 2] not in parsed_files:
+                return True
+    return False
 
 
 def parse_email_and_save_attachments(msg, path, parsed_files):
