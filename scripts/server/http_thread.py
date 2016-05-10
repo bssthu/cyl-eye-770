@@ -30,7 +30,7 @@ class HttpThread(threading.Thread):
         """
         super().__init__()
         self.port = http_config['port']
-        HttpThread.heartbeat_timeout_limit = http_config['heartbeatTimeout']
+        HttpThread.heartbeat_timeout_limit = http_config.get('heartbeatTimeout', 300)
 
         self.server = None
         self.running = True

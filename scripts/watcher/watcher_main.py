@@ -38,16 +38,12 @@ def load_config(config_file_name):
             and 'name' in configs['email'] \
             and 'password' in configs['email'] \
             and 'smtpServer' in configs['email'] \
-            and 'interval' in configs['email'] \
             and 'watchPath' in configs['email'] \
             and 'fileExt' in configs['email'] \
             and 'fileNum' in configs['email'] \
             and 'files' in configs \
-            and 'dateFormat' in configs['files'] \
-            and 'interval' in configs['files'] \
             and 'alarmPath' in configs['files'] \
-            and 'heartbeatPath' in configs['files'] \
-            and 'enableLog' in configs:
+            and 'heartbeatPath' in configs['files']:
         return configs
     else:
         print('missing element(s) in %s.' % config_file_name)
@@ -66,8 +62,9 @@ def main():
         return
 
     # log init
+    enable_log = configs.get('enableLog', 'True').lower() == 'true'
     log_path = os.path.abspath(os.path.join(root_dir, 'logs'))
-    log.initialize_logging('watcher', log_path, configs['enableLog'].lower() == 'true')
+    log.initialize_logging('watcher', log_path, enable_log)
     log.info('watcher main: start')
     warn.initialize_warn(configs['httpServer'])
 

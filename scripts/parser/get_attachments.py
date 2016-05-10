@@ -144,15 +144,18 @@ def main():
     if 'email' not in configs \
             or 'name' not in configs['email'] \
             or 'password' not in configs['email'] \
-            or 'imapServer' not in configs['email'] \
-            or 'criteria' not in configs['email'] \
-            or 'attachmentPath' not in configs:
+            or 'imapServer' not in configs['email']:
         print('missing element(s) in parser config.')
         return None
 
-    get_mail(configs['email']['imapServer'], 993,
+    port = configs['email'].get('port', 993)
+    criteria = configs['email'].get('criteria', 'ALL')
+    attachment_path = configs.get('attachmentPath', './')
+
+    # download attachments
+    get_mail(configs['email']['imapServer'], port,
              configs['email']['name'], configs['email']['password'],
-             configs['email']['criteria'], configs['attachmentPath'])
+             criteria, attachment_path)
 
 
 if __name__ == '__main__':

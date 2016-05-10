@@ -26,14 +26,11 @@ class MailSenderThread(threading.Thread):
         self.email_name = email_config['name']
         self.email_password = email_config['password']
         self.smtp_server = email_config['smtpServer']
-        self.interval = email_config['interval']
         self.watch_path = email_config['watchPath']
-        if 'extraWatchFiles' in email_config and isinstance(email_config['extraWatchFiles'], list):
-            self.extra_watch_files = email_config['extraWatchFiles']
-        else:
-            self.extra_watch_files = []
         self.file_ext = email_config['fileExt']
         self.file_num = email_config['fileNum']
+        self.interval = email_config.get('interval', 40)
+        self.extra_watch_files = email_config.get('extraWatchFiles', [])
         self.running = True
 
     def run(self):

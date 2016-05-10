@@ -27,10 +27,10 @@ class FileCheckerThread(threading.Thread):
 
         super().__init__()
         self.server_url = 'http://%s:%d/' % (http_config['ipAddress'], http_config['port'])
-        self.interval = file_config['interval']
-        self.date_format = file_config['dateFormat']
         self.alarm_path = file_config['alarmPath']
         self.heartbeat_path = file_config['heartbeatPath']
+        self.date_format = file_config.get('dateFormat', '%Y/%m/%d %H:%M:%S')
+        self.interval = file_config.get('interval', 40)
 
         self.alarm_check_time = datetime.datetime.now()     # 最近一次检查的时刻
         self.heartbeat_check_time = self.alarm_check_time
