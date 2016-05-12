@@ -18,25 +18,6 @@ max_file_num_to_replace = 1    # 替换一定数量的本地文件后不再运�
 file_num_replaced = 0
 
 
-def load_config(config_file_name):
-    """载入配置文件
-
-    Args:
-        config_file_name: 配置文件名
-    """
-
-    # load
-    try:
-        with open(config_file_name) as config_data:
-            configs = json.load(config_data)
-    except Exception as e:
-        print('failed to load config from %s.' % config_file_name)
-        print(e)
-        return None
-
-    return configs
-
-
 def get_mail(host, port, user, password, criteria, attachment_path):
     """收取邮件，遍历解析
 
