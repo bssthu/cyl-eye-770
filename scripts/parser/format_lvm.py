@@ -21,6 +21,7 @@ def format_data_in_path(attachment_path):
     # merge data from files
     data = []
     for dir_path, dir_names, file_names in os.walk(attachment_path):
+        file_names.sort()
         for file_name in file_names:
             file_abs_path = os.path.join(dir_path, file_name)
             if file_abs_path.endswith('.lvm') and os.path.isfile(file_abs_path):
