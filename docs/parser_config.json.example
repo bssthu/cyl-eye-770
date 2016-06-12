@@ -3,7 +3,7 @@
     "name": "abc@def.com",
     "password": "def",
     "imapServer": "imap.foo.bar",
-    "criteria": "('SINCE' '01-Jan-2000')"
+    "criteria": "(SINCE \"01-Jan-2000\")"
   },
   "attachmentPath": "./",
   "maxFileNumToReplace": -1
