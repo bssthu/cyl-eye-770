@@ -12,10 +12,13 @@ import hashlib
 from load_parser_config import *
 
 
-STR_EXCEED_MAX_FILE_NUM = 'exceed max file num to replace'
+STR_EXCEED_MAX_FILE_NUM_REPLACE = 'exceed max file num to replace'
+STR_EXCEED_MAX_FILE_NUM_SKIP = 'exceed max file num to skip'
 
-max_file_num_to_replace = 1    # 替换一定数量的本地文件后不再运行，-1表示无限
+max_file_num_to_replace = 1     # 替换一定数量的本地文件后不再运行，-1表示无限
+max_file_num_to_skip = 1        # 跳过若干 hash 相同的文件后停止操作，-1表示无限
 file_num_replaced = 0
+file_num_skipped = 0
 
 
 def get_mail(host, port, user, password, criteria, attachment_path):
@@ -31,6 +34,7 @@ def get_mail(host, port, user, password, criteria, attachment_path):
     """
 
     # 建立连接
+    print('connecting to %s...' % host)
     try:
         conn = imaplib.IMAP4_SSL(host, port)
         conn.login(user, password)
@@ -39,6 +43,7 @@ def get_mail(host, port, user, password, criteria, attachment_path):
         return
 
     # 获取列表
+    print('search inbox...')
     try:
         conn.select('INBOX', False)
         typ, data = conn.search(None, criteria)
@@ -49,20 +54,23 @@ def get_mail(host, port, user, password, criteria, attachment_path):
         return
 
     # 遍历列表
+    print('found %d mails.' % len(mail_ids))
     parsed_files = []
-    exceed_max_file_num = False
     for mail_id in mail_ids:
         try:
             typ, data = conn.fetch(mail_id, 'BODYSTRUCTURE')
+            print('fetching mail %s. bodystructure: %d bytes' % (mail_id, len(data[0])))
             if exists_new_attachment_name(data[0].decode(), parsed_files):
                 typ, data = conn.fetch(mail_id, '(RFC822)')
                 msg = email.message_from_bytes(data[0][1])
                 parse_email_and_save_attachments(msg, attachment_path, parsed_files)   # 解析，下载附件
         except Exception as e:
-            print('failed to get attachment(s) from mail %s: %s' % (mail_id, e))
-            if str(e) == STR_EXCEED_MAX_FILE_NUM:
+            if str(e) == STR_EXCEED_MAX_FILE_NUM_REPLACE \
+                    or str(e) == STR_EXCEED_MAX_FILE_NUM_SKIP:
+                print('mail %s: %s' % (mail_id, e))
                 break  # 不再下载
-            continue
+            else:
+                print('failed to get attachment(s) from mail %s: %s' % (mail_id, e))
 
 
 def exists_new_attachment_name(bodystructure, parsed_files):
@@ -92,7 +100,7 @@ def parse_email_and_save_attachments(msg, path, parsed_files):
         parsed_files: 已下载或检查的附件名
     """
 
-    global max_file_num_to_replace, file_num_replaced
+    global max_file_num_to_replace, max_file_num_to_skip, file_num_replaced, file_num_skipped
 
     for part in msg.walk():
         if not part.is_multipart():
@@ -111,19 +119,23 @@ def parse_email_and_save_attachments(msg, path, parsed_files):
                     # compare
                     abspath = os.path.join(path, filename)
                     if os.path.isfile(abspath):
-                        # mark replaced
-                        file_num_replaced += 1
-                        if file_num_replaced > max_file_num_to_replace >= 0:
-                            # 要替换文件数超过限制，则不再替换
-                            raise RuntimeError(STR_EXCEED_MAX_FILE_NUM)
-
                         fp = open(abspath, 'rb')
                         current_hash = hashlib.md5(fp.read()).hexdigest()
                         fp.close()
                         # 去重
                         if file_hash == current_hash:
                             print('skip file %s' % filename)
+                            # mark skipped
+                            file_num_skipped += 1
+                            if file_num_skipped > max_file_num_to_skip >= 0:
+                                raise RuntimeError(STR_EXCEED_MAX_FILE_NUM_SKIP)
                             continue
+
+                        # mark replaced if exists and not same
+                        file_num_replaced += 1
+                        if file_num_replaced > max_file_num_to_replace >= 0:
+                            # 要替换文件数超过限制，则不再替换
+                            raise RuntimeError(STR_EXCEED_MAX_FILE_NUM_REPLACE)
 
                     # save file
                     try:
@@ -150,8 +162,9 @@ def main():
     port = configs['email'].get('port', 993)
     criteria = configs['email'].get('criteria', 'ALL')
     attachment_path = configs.get('attachmentPath', './')
-    global max_file_num_to_replace
+    global max_file_num_to_replace, max_file_num_to_skip
     max_file_num_to_replace = configs.get('maxFileNumToReplace', -1)
+    max_file_num_to_skip = configs.get('maxFileNumToSkip', -1)
 
     # download attachments
     get_mail(configs['email']['imapServer'], port,

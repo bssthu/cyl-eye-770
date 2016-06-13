@@ -6,5 +6,6 @@
     "criteria": "(SINCE \"01-Jan-2000\")"
   },
   "attachmentPath": "./",
-  "maxFileNumToReplace": -1
+  "maxFileNumToReplace": -1,
+  "maxFileNumToSkip": -1
 }
