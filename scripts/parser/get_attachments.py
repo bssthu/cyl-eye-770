@@ -9,6 +9,7 @@
 import imaplib
 import email
 import hashlib
+import time
 from load_parser_config import *
 
 
@@ -59,7 +60,10 @@ def get_mail(host, port, user, password, criteria, attachment_path):
     for mail_id in mail_ids:
         try:
             typ, data = conn.fetch(mail_id, 'BODYSTRUCTURE')
-            print('fetching mail %s. bodystructure: %d bytes' % (mail_id, len(data[0])))
+            while typ != 'OK':      # retry if fail
+                typ, data = conn.fetch(mail_id, 'BODYSTRUCTURE')
+                time.sleep(5)
+            print('fetching mail %s. %s. bodystructure: %d bytes' % (mail_id, typ, len(data[0])))
             if exists_new_attachment_name(data[0].decode(), parsed_files):
                 typ, data = conn.fetch(mail_id, '(RFC822)')
                 msg = email.message_from_bytes(data[0][1])
@@ -142,7 +146,7 @@ def parse_email_and_save_attachments(msg, path, parsed_files):
                         fp = open(abspath, 'wb')
                         fp.write(content)
                         fp.close()
-                        print('save %s' % filename)
+                        print('- save %s' % filename)
                     except IOError as e:
                         print('failed to download file %s: %s' % (filename, e))
 
