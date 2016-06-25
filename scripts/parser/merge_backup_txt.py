@@ -79,8 +79,18 @@ def format_data_file(file_path):
         data_in_line = [stamp_str, stamp_seconds]
 
         # 前 6 行，数据
-        for j in range(0, 6):
-            data_in_line.extend(lines[i*7 + j].split('\t')[0:4])
+        # 如果是 NaN，就用上一次的
+        if 'NaN' == lines[i*7][:3]:
+            if len(data_in_file) > 0:
+                data_in_last_line = data_in_file[-1]
+                data_in_line.extend(data_in_last_line[2:])
+            else:
+                # 跳过一开始的 NaN
+                # NaN 的情况是从最后一个文件才开始出现的，所以不做跨文件的处理
+                continue
+        else:
+            for j in range(0, 6):
+                data_in_line.extend(lines[i*7 + j].split('\t')[0:4])
 
         # add this line to list
         data_in_file.append(data_in_line)
