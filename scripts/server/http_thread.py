@@ -89,6 +89,12 @@ class RequestHandler(BaseHTTPRequestHandler):
         self.timeout = 20
         BaseHTTPRequestHandler.__init__(self, request, client_address, server)
 
+    def handle_one_request(self):
+        try:
+            super().handle_one_request()
+        except Exception as e:
+            self.log_error('Exception during handle_one_request: %r', e)
+
     def do_GET(self):
         try:
             self.send_response(200, message=None)
