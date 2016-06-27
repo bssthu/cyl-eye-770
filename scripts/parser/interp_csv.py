@@ -67,7 +67,7 @@ def save_to_csv(filename, data):
     with open(filename, 'wt') as fp:
         for timeint, raw in data:
             timestamp = time.strptime(time.ctime(timeint))
-            timestr = time.strftime('%Y%m%d.%H%M%S', timestamp)
+            timestr = time.strftime('%Y%m%d %H%M%S', timestamp)
             line = '%s, %d, %s\n' % (timestr, timeint, raw)
             fp.writelines(line)
 
@@ -96,7 +96,7 @@ def resample_csv(filename, interval):
     # 从第一个时刻开始，每过 interval 采一个点，该点的值取 origin 中当前时刻的值或当前以前最近一个时刻的值
     i_origin = 1
     t_resample = time_begin + interval
-    while t_resample < time_end:
+    while t_resample <= time_end:
         while data_from_origin[i_origin][0] < t_resample:
             i_origin += 1
         raw_latest = data_from_origin[i_origin-1][1]
