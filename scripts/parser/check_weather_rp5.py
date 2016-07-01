@@ -6,16 +6,18 @@
 # Description   : 检查来自 rp5.ru 的天气数据，找出在 format_data 中对应的位置
 # 
 
+import sys
 import time
 import datetime
 from load_parser_config import *
 
 
-def check_weather_data(attachment_path):
+def check_weather_data(attachment_path, format_data_file):
     """处理目录中的所有数据
 
     Args:
         attachment_path: 数据存放路径
+        format_data_file: format_data.csv，需要将天气数据的时间戳与该文件对应
     """
 
     # load weather history
@@ -34,7 +36,7 @@ def check_weather_data(attachment_path):
 
     # load & check format_data
     format_data_timestamp = []
-    format_data_path = os.path.join(attachment_path, 'format_data.csv')
+    format_data_path = os.path.join(attachment_path, format_data_file)
     i = 0       # index of temperature_record
     line_no = 0     # index of fp.readlines()
     with open(format_data_path) as fp:
@@ -60,13 +62,17 @@ def main():
     if configs is None:
         return
 
+    format_data_file = 'format_data.csv'
+    if len(sys.argv) == 2:
+        format_data_file = sys.argv[1]
+
     attachment_path = configs.get('attachmentPath', './')
 
     # check data
     if not os.path.isdir(attachment_path):
         print('path not exists.')
         return
-    check_weather_data(attachment_path)
+    check_weather_data(attachment_path, format_data_file)
 
 
 if __name__ == '__main__':
