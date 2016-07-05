@@ -64,12 +64,14 @@ def save_to_csv(filename, data):
         filename: csv 文件路径
         data: 要写入的 list， list 中每一项格式为 (timeint, raw)
     """
+    lines = []
+    for timeint, raw in data:
+        timestamp = time.strptime(time.ctime(timeint))
+        timestr = time.strftime('%Y%m%d %H%M%S', timestamp)
+        line = '%s, %d, %s\n' % (timestr, timeint, raw)
+        lines.append(line)
     with open(filename, 'wt') as fp:
-        for timeint, raw in data:
-            timestamp = time.strptime(time.ctime(timeint))
-            timestr = time.strftime('%Y%m%d %H%M%S', timestamp)
-            line = '%s, %d, %s\n' % (timestr, timeint, raw)
-            fp.writelines(line)
+        fp.writelines(lines)
 
 
 def resample_csv(filename, interval):
